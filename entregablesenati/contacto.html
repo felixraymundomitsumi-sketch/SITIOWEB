@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HealthyFit | Contacto</title>
+  <link rel="stylesheet" href="estilos.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="single-page page-contacto">
+
+<header>
+  <div class="nav-container">
+    <a class="logo" href="index.html" aria-label="HealthyFit, ir al inicio">
+      <img src="logo.jpeg" alt="Logo de HealthyFit" class="logo-img">
+      <span class="logo-caption"><strong>HealthyFit</strong><small>FITNESS &amp; NUTRITION</small></span>
+    </a>
+    <nav aria-label="Navegación principal">
+      <ul>
+        <li><a href="index.html" data-page="inicio">INICIO</a></li>
+        <li><a href="servicios.html" data-page="servicios">SERVICIOS</a></li>
+        <li><a href="instalaciones.html" data-page="instalaciones">INSTALACIONES</a></li>
+        <li><a href="entrenadores.html" data-page="entrenadores">EQUIPO</a></li>
+        <li><a href="clientes.html" data-page="clientes">CLIENTES</a></li>
+        <li><a href="blog.html" data-page="blog">BLOG</a></li>
+        <li><a href="contacto.html" data-page="contacto" class="active">CONTACTO</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main>
+<section id="contacto" class="contact-section">
+    <div class="contact-heading">
+      <span class="eyebrow">ESTAMOS PARA AYUDARTE</span>
+      <h2 class="section-title">Hablemos de tus objetivos</h2>
+      <p>Escríbenos y te ayudaremos a encontrar el plan ideal para ti.</p>
+    </div>
+    <div class="contact-container">
+      
+      <!-- INFORMACIÓN DE CONTACTO Y DIRECCIÓN -->
+      <div class="contact-info-box">
+        <div class="info-item">
+          <span class="info-icon">📍</span>
+          <div>
+            <h4>Dirección de Instalaciones:</h4>
+            <p>Av. Manuel Prado #456, Piso 2, Satipo, Junín</p>
+          </div>
+        </div>
+        <div class="info-item">
+          <span class="info-icon">📞</span>
+          <div>
+            <h4>Teléfono / WhatsApp:</h4>
+            <p>+51 987 654 321</p>
+          </div>
+        </div>
+        <div class="info-item">
+          <span class="info-icon">✉️</span>
+          <div>
+            <h4>Correo Electrónico:</h4>
+            <p>contacto@healthyfit.com</p>
+          </div>
+        </div>
+      </div>
+
+      <section id="contacto" class="seccion contacto">
+    <div class="contenedor">
+        
+        <h2>Contacto</h2>
+        <p class="descripcion">Escríbenos y te ayudaremos a encontrar el plan ideal para ti.</p>
+        <div class="contacto-panel">
+<form id="contacto-form">
+
+            <label for="nombre">Nombre completo</label>
+            <input
+                type="text"
+                id="nombre"
+                name="nombre"
+                required
+                maxlength="100"
+                placeholder="Ingresa tu nombre">
+
+            <label for="correo">Correo electrónico</label>
+            <input
+                type="email"
+                id="correo"
+                name="correo"
+                required
+                maxlength="254"
+                placeholder="ejemplo@gmail.com">
+
+            <label for="asunto">Asunto</label>
+            <input
+                type="text"
+                id="asunto"
+                name="asunto"
+                required
+                maxlength="150"
+                placeholder="Motivo del mensaje">
+
+            <label for="mensaje">Mensaje</label>
+            <textarea
+                id="mensaje"
+                name="mensaje"
+                required
+                maxlength="5000"
+                placeholder="Escribe tu mensaje"></textarea>
+
+            <button type="submit" id="boton">
+                Enviar mensaje
+            </button>
+
+            <div id="respuesta" role="status" aria-live="polite"></div>
+
+        </form>
+        </div>
+    </div>
+</section>
+</main>
+
+<footer>
+    <p>HealthyFit © 2026. Todos los derechos reservados.</p>
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+
+<script>
+    // 1. CONFIGURACIÓN DEL CORREO ELECTRÓNICO
+    emailjs.init({
+        publicKey: "4GLybrnAGETZ_iR_S"
+    });
+
+    // 3. ELEMENTOS DEL FORMULARIO
+    const formularioContacto = document.getElementById("contacto-form");
+    const botonContacto = document.getElementById("boton");
+    const respuestaContacto = document.getElementById("respuesta");
+
+    // 4. ENVIAR FORMULARIO AL CORREO Y A GOOGLE SHEETS
+    formularioContacto.addEventListener("submit", async function(event) {
+        event.preventDefault();
+
+        if (!formularioContacto.reportValidity()) return;
+
+        botonContacto.disabled = true;
+        botonContacto.textContent = "Enviando...";
+        respuestaContacto.textContent = "";
+
+        // Preparar los datos del formulario
+        const datos = {
+            nombre: document.getElementById("nombre").value.trim(),
+            correo: document.getElementById("correo").value.trim(),
+            asunto: document.getElementById("asunto").value.trim(),
+            mensaje: document.getElementById("mensaje").value.trim()
+        };
+
+        // Envío al correo mediante EmailJS
+        const envioCorreo = emailjs.sendForm(
+            "service_hr478cc",
+            "template_lkr4lyg",
+            formularioContacto
+        );
+
+        // Envío a Google Sheets mediante Google Apps Script
+        const envioHoja = fetch(URL_GOOGLE_SHEETS, {
+            method: "POST",
+            mode: "no-cors",
+            body: new URLSearchParams(datos)
+        });
+
+        // Esperar ambos intentos de envío
+        const resultados = await Promise.allSettled([
+            envioCorreo,
+            envioHoja
+        ]);
+
+        const correoEnviado =
+            resultados[0].status === "fulfilled";
+
+        const solicitudHojaEnviada =
+            resultados[1].status === "fulfilled";
+
+        if (correoEnviado && solicitudHojaEnviada) {
+            respuestaContacto.textContent =
+                "¡Formulario enviado! Revisa tu correo y verifica el registro en Google Sheets.";
+            respuestaContacto.style.color = "#137333";
+            formularioContacto.reset();
+
+        } else if (correoEnviado) {
+            respuestaContacto.textContent =
+                "El correo se envió, pero hubo un problema al enviar los datos a Google Sheets.";
+            respuestaContacto.style.color = "#b45309";
+            formularioContacto.reset();
+
+            console.error("Error de Google Sheets:", resultados[1].reason);
+
+        } else if (solicitudHojaEnviada) {
+            respuestaContacto.textContent =
+                "No se pudo enviar el correo. Verifica si los datos llegaron a Google Sheets.";
+            respuestaContacto.style.color = "#b45309";
+
+            console.error("Error de EmailJS:", resultados[0].reason);
+
+        } else {
+            respuestaContacto.textContent =
+                "No se pudieron completar los envíos. Inténtalo nuevamente.";
+            respuestaContacto.style.color = "#b42318";
+
+            console.error("Errores de envío:", resultados);
+        }
+
+        botonContacto.disabled = false;
+        botonContacto.textContent = "Enviar mensaje";
+    });
+</script>
+</body>
+</html>
+
